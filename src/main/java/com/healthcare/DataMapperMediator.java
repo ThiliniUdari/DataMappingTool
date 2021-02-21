@@ -142,9 +142,6 @@ public class DataMapperMediator {
         String value;
         for (Map.Entry<OutputPosition, OutputResolver> entry : map.entrySet()) {
             value = "";
-           // System.out.println("Key:" + entry.getKey().getPath());
-           // System.out.println("Value:" + entry.getValue().elementList.get(0).getPath());
-           // System.out.println("-----------");
             values = entry.getValue().getFinalValue(request);
             for (String item : values) {
                 value = value.concat(item).concat(",");
