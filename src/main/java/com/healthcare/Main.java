@@ -35,12 +35,12 @@ public class Main {
             switch (option) {
                 case 1:
                     //Input file
+//                    XmlElement input= new XmlElement();
+//                    input.generatePath();
                     System.out.println("Type:");
                     type = scanner.next();
 
-
                     System.out.println("Input File: ");
-
                     String fileName=scanner.next();
                     String inputFilePath = ROOTPATH.concat(fileName);
 

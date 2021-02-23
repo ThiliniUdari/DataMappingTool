@@ -15,33 +15,30 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class XmlElement implements InputElement{
     private String sourceId;
     private String xPath;
     private String element;
     private String type;
+    private String value; //request
 
     public String getValue() {
         return value;
     }
-
     public void setValue(String value) {
         this.value = value;
     }
-
-    private String value;
-
     public void setType(String type) {
         this.type = type;
     }
-
     public String getType() {
         return type;
     }
 
-   // private String value=null;
 
    public void setxPath(String xPath) {
        this.xPath = xPath;
@@ -53,34 +50,39 @@ public class XmlElement implements InputElement{
     public String getSourceId() { return sourceId;}
     public void setSourceId(String sourceId) { this.sourceId = sourceId;}
 
-    @Override
-    public void generatePath() {
-//        //set the xPath variable
+    Map<String,String> result=new HashMap<>();
+
+
+    public Map generatePath(File file)  {
+//   set the xPath variable
 
         SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp = null;
         XMLReader xr = null;
+
         try {
             sp = spf.newSAXParser();
             xr = sp.getXMLReader();
-            xr.setContentHandler(new FragmentContentHandler(xr));
-            xr.parse(new InputSource(new FileInputStream("//home//thilini//Desktop//OH_DataMapper//samples//input.xml")));
-                    //(new FileInputStream("input.xml")));
-
-
+            FragmentContentHandler contentHandler=new FragmentContentHandler(xr);
+            xr.setContentHandler(contentHandler);
+            xr.parse(new InputSource(new FileInputStream(file)));
+            result= contentHandler.result ;
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
-
         } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+
         }
+        //contentHandler.clearResultMap();
+
+        return result;
 
 
     }
+
     @Override
     public List evaluatePath(File request) {
 
@@ -113,6 +115,5 @@ public class XmlElement implements InputElement{
             e.printStackTrace();
         }
        return values;
-
     }
 }

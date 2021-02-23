@@ -2,6 +2,7 @@ package com.healthcare;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public class CsvElement implements InputElement{
     private String sourceId;
@@ -22,8 +23,8 @@ public class CsvElement implements InputElement{
     public void setSourceId(String sourceId) { this.sourceId = sourceId;}
 
     @Override
-    public void generatePath() {
-
+    public Map generatePath(File file) {
+        return null;
     }
     public List evaluatePath(File msg){
         return null;
