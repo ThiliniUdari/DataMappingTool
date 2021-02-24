@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.healthcare.Main.ROOTPATH;
+import static com.healthcare.XsdXpathGenerator.getAllXpaths;
 
 public class DataMapperMediator {
 
@@ -64,10 +65,10 @@ public class DataMapperMediator {
             case "xml":
                 FragmentContentHandler contentHandler=new FragmentContentHandler();
                 try {
-                    Map<String,String>xpathWithName=contentHandler.generateXPath(file);
-                    for (Map.Entry<String, String> entry : xpathWithName.entrySet()) {
+                    Map<String,String>xpathWithName=contentHandler.generateXPath(file); // for xml files
+                    Map<String,String>  xpathfromXsd = getAllXpaths(file);// for xsd files
+                    for (Map.Entry<String, String> entry : xpathfromXsd.entrySet()) {
                        System.out.println(entry.getKey() + " -->  " + entry.getValue());
-
                         if(isSource) {
                         XmlElement input = new XmlElement();
                         input.setxPath(entry.getKey());
@@ -142,10 +143,7 @@ public class DataMapperMediator {
             e.printStackTrace();
         }
     }
-    public  String getRequest(){
-        return null;
 
-    }
     public void evaluateRequest(File request) {
         List<String> values;
         String value;
@@ -154,10 +152,9 @@ public class DataMapperMediator {
             values = entry.getValue().getFinalValue(request);
             for (String item : values) {
                 value = value.concat(item).concat(",");
-                System.out.println("Final Value:-"+value);
             }
             entry.getKey().setValue(value);
-        }
+        }  System.out.println("---Result----");
         for (OutputPosition output : outputPositions) {
             System.out.println("Element:" + output.getElement() + "  value:" + output.getValue());
         }
