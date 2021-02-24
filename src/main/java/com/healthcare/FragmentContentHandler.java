@@ -18,7 +18,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 
 public class FragmentContentHandler  extends DefaultHandler{
-    String xPath = "/";
+    String xPath = "";
     XMLReader xmlReader;
     FragmentContentHandler parent;
     StringBuilder characters = new StringBuilder();

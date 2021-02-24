@@ -44,9 +44,7 @@ public class DataMapperMediator {
         this.output=dest;
         File file= new File(ROOTPATH+outputFileName);
         createElementList(output.getId(),output.getType(),file,false);
-        for(Object element:outputPositions){
-            System.out.println("Element:"+element);
-        }System.out.println("---Output Element List created:"+outputPositions.size());
+       if(outputPositions.size()>0)System.out.println("---Output Element List created:"+outputPositions.size());
     }
     public void setSourceList(Source src) {
         //System.out.println(src.getId());
@@ -57,9 +55,7 @@ public class DataMapperMediator {
         }System.out.println("---Source List created----");
         File file =new File(ROOTPATH+inputFileName);
         createElementList(src.getId(),src.getType(),file,true);
-        for(Object element:inputElements){
-            System.out.println("Element:"+element);
-        }System.out.println("---Input Element List created:"+inputElements.size());
+        if(inputElements.size()>0)System.out.println("---Input Element List created:"+inputElements.size());
 
     }
 
@@ -68,7 +64,6 @@ public class DataMapperMediator {
             case "xml":
                 FragmentContentHandler contentHandler=new FragmentContentHandler();
                 try {
-
                     Map<String,String>xpathWithName=contentHandler.generateXPath(file);
                     for (Map.Entry<String, String> entry : xpathWithName.entrySet()) {
                        System.out.println(entry.getKey() + " -->  " + entry.getValue());
@@ -98,39 +93,11 @@ public class DataMapperMediator {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-//                    XmlElement element = new XmlElement();
-//                    //  XsdXpathGenerator generator =new XsdXpathGenerator();
-//                    Map<String,String>xpathWithName=element.generatePath(file);
-//                    //generator.getAllXpaths(file);
-//                    for (Map.Entry<String, String> entry : xpathWithName.entrySet()) {
-//                        System.out.println(entry.getKey() + " -->  " + entry.getValue());
-//                        if(isSource) {
-//                        XmlElement input = new XmlElement();
-//                        input.setxPath(entry.getKey());
-//                        input.setSourceId(id);
-//                        input.setElement(entry.getValue());
-//                        input.setType("xml");
-//                        inputElements.add(input);
-//                    }
-//
-//                     else{
-//                        XmlOutputPosition outputPosition =new XmlOutputPosition();
-//
-//                            outputPosition.setPath(entry.getKey());
-//                            outputPosition.setElement(entry.getValue());
-//                            outputPosition.setType("xml");
-//                            outputPosition.setId(id);
-//                            outputPositions.add(outputPosition);
-//                        }
-//        }
-                System.out.println("----------");
                 break;
             case "json":
             case "csv":
             default:
                 System.out.println("Invalid Format");
-               // return null;
        }
     }
 
@@ -146,7 +113,7 @@ public class DataMapperMediator {
 
             do{
                 line =sc.nextLine();
-                int i=line.indexOf(':');
+                int i=line.indexOf('=');
 
                 String input =line.substring(0,i).trim();// simple transition 1:1
                 String output = line.substring(i+1).trim();
@@ -157,9 +124,7 @@ public class DataMapperMediator {
                      if (position.getPath().equals(output)) {
                        //  System.out.println("position "+position.getPath()+")=="+output);
                          for(InputElement element:inputElements){
-
                              if (element.getPath().equals(input)) {
-                               //  System.out.println("input "+element.getPath()+")=="+input);
                                  OutputResolver resolver = new OutputResolver();
                                  resolver.elementList.add(element);
                                  resolvers.add(resolver);
@@ -189,10 +154,10 @@ public class DataMapperMediator {
             values = entry.getValue().getFinalValue(request);
             for (String item : values) {
                 value = value.concat(item).concat(",");
+                System.out.println("Final Value:-"+value);
             }
             entry.getKey().setValue(value);
         }
-
         for (OutputPosition output : outputPositions) {
             System.out.println("Element:" + output.getElement() + "  value:" + output.getValue());
         }
