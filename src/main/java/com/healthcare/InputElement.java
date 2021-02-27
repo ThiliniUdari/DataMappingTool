@@ -5,11 +5,17 @@ import java.util.List;
 import java.util.Map;
 
 public interface InputElement {
+     void setType(String type);
+     String getType();
 
-    public String getElement();
-    public String getPath();
-    public String getSourceId();
-    public Map generatePath(File file);
-    public String getType();
-    public List evaluatePath(File msg) ;
+     void setPath(String path) ;
+     String getPath();
+
+     String getSourceId();
+     void setSourceId(String sourceId);
+
+     String getElement();
+     void setElement(String element);
+
+     List evaluatePath(File msg) ;
 }

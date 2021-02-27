@@ -9,7 +9,6 @@ public class CsvElement implements InputElement{
     private String csvPath;
     private String element;
     private String type;
-   // private String value=null;
 
     public void setType(String type){this.type=type ;}
     public String getType(){
@@ -18,14 +17,13 @@ public class CsvElement implements InputElement{
     public String getElement() { return element; }
     public void setElement(String element) { this.element = element;}
     public String getPath() { return csvPath;}
+    public void setPath(String path){this.csvPath=path;}
+
 
     public String getSourceId() { return sourceId;}
     public void setSourceId(String sourceId) { this.sourceId = sourceId;}
 
     @Override
-    public Map generatePath(File file) {
-        return null;
-    }
     public List evaluatePath(File msg){
         return null;
     }

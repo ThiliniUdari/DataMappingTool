@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.healthcare.Main.ROOTPATH;
+import static com.healthcare.XsdXpathGenerator.getAllXpaths;
 
 public class DataMapperMediator {
 
@@ -23,20 +24,19 @@ public class DataMapperMediator {
     //temp
     String inputFileName ;
     String outputFileName;
+
+
     public void loadInput(String type, String inputPayload ,String inputFileName) {
         this.inputFileName=inputFileName;
-
         String srcId="src001"; //***temp
         Source src=new Source(inputPayload);
         src.setType(type);
         src.setId(srcId);
-
         setSourceList(src);
     }
 
     public void loadOutput(String type,String outputPayload,String outputFileName){
         this.outputFileName =outputFileName;
-
         String destId ="dest001";  //temp
         Destination dest =new Destination(outputPayload);
         dest.setId(destId);
@@ -44,122 +44,69 @@ public class DataMapperMediator {
         this.output=dest;
         File file= new File(ROOTPATH+outputFileName);
         createElementList(output.getId(),output.getType(),file,false);
-        for(Object element:outputPositions){
-            System.out.println("Element:"+element);
-        }System.out.println("---Output Element List created:"+outputPositions.size());
+       if(outputPositions.size()>0)System.out.println("---Output Element List created:"+outputPositions.size());
     }
     public void setSourceList(Source src) {
-        //System.out.println(src.getId());
         sourceList.add(src);
         System.out.println("Source List : ");
         for (Object source:sourceList){
             System.out.println(source);
-        }System.out.println("---Source List created----");
+        }
+        if (sourceList.size()>0)    System.out.println("---Source List created----");
         File file =new File(ROOTPATH+inputFileName);
         createElementList(src.getId(),src.getType(),file,true);
-        for(Object element:inputElements){
-            System.out.println("Element:"+element);
-        }System.out.println("---Input Element List created:"+inputElements.size());
-
+        if(inputElements.size()>0)  System.out.println("---Input Element List created:"+inputElements.size());
     }
 
     public void createElementList(String id,String type,File file,boolean isSource){
-        switch (type){
-            case "xml":
-                FragmentContentHandler contentHandler=new FragmentContentHandler();
-                try {
 
-                    Map<String,String>xpathWithName=contentHandler.generateXPath(file);
-                    for (Map.Entry<String, String> entry : xpathWithName.entrySet()) {
-                       System.out.println(entry.getKey() + " -->  " + entry.getValue());
+       ElementFactory elementFactory =new ElementFactory();
 
-                        if(isSource) {
-                        XmlElement input = new XmlElement();
-                        input.setxPath(entry.getKey());
-                        input.setSourceId(id);
-                        input.setElement(entry.getValue());
-                        input.setType("xml");
-                        inputElements.add(input);
-                       }
-                     else{
-                        XmlOutputPosition outputPosition =new XmlOutputPosition();
-                        outputPosition.setPath(entry.getKey());
-                        outputPosition.setElement(entry.getValue());
-                        outputPosition.setType("xml");
-                        outputPosition.setId(id);
-                        outputPositions.add(outputPosition);
 
-                        }
-                    }
-                } catch (ParserConfigurationException e) {
-                    e.printStackTrace();
-                } catch (SAXException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
-//                    XmlElement element = new XmlElement();
-//                    //  XsdXpathGenerator generator =new XsdXpathGenerator();
-//                    Map<String,String>xpathWithName=element.generatePath(file);
-//                    //generator.getAllXpaths(file);
-//                    for (Map.Entry<String, String> entry : xpathWithName.entrySet()) {
-//                        System.out.println(entry.getKey() + " -->  " + entry.getValue());
-//                        if(isSource) {
-//                        XmlElement input = new XmlElement();
-//                        input.setxPath(entry.getKey());
-//                        input.setSourceId(id);
-//                        input.setElement(entry.getValue());
-//                        input.setType("xml");
-//                        inputElements.add(input);
-//                    }
-//
-//                     else{
-//                        XmlOutputPosition outputPosition =new XmlOutputPosition();
-//
-//                            outputPosition.setPath(entry.getKey());
-//                            outputPosition.setElement(entry.getValue());
-//                            outputPosition.setType("xml");
-//                            outputPosition.setId(id);
-//                            outputPositions.add(outputPosition);
-//                        }
-//        }
-                System.out.println("----------");
-                break;
-            case "json":
-            case "csv":
-            default:
-                System.out.println("Invalid Format");
-               // return null;
-       }
+       Map<String,String>pathResults=elementFactory.generatePath(type,file); // for xml files
+       Map<String,String>  xpathfromXsd = getAllXpaths(file);// for xsd files
+
+        for (Map.Entry<String, String> entry : pathResults.entrySet()) {
+           System.out.println(entry.getKey() + " -->  " + entry.getValue());
+
+            InputElement inputElement=elementFactory.getInputElement(type);
+            OutputPosition outputPosition=elementFactory.getOutputElement(type);
+         if(isSource) {
+            inputElement.setPath(entry.getKey());
+            inputElement.setSourceId(id);
+            inputElement.setElement(entry.getValue());
+            inputElement.setType(type);
+            inputElements.add(inputElement);
+           }
+         else{
+            outputPosition.setPath(entry.getKey());
+            outputPosition.setElement(entry.getValue());
+            outputPosition.setType(type);
+            outputPosition.setId(id);
+            outputPositions.add(outputPosition);
+            }
+        }
     }
 
-    public void doMapping(){
+    public void doMapping(File file){
 
-        System.out.println("Map file:");
-        Scanner scanner =new Scanner(System.in);
-        String  filePath = ROOTPATH.concat(scanner.next());
-        String line;
+       String line;
         try {
-            FileInputStream inputStream=new FileInputStream(filePath);
+            FileInputStream inputStream=new FileInputStream(file);
             Scanner sc =new Scanner(inputStream);
-
             do{
                 line =sc.nextLine();
-                int i=line.indexOf(':');
+                int i=line.indexOf('=');
 
                 String input =line.substring(0,i).trim();// simple transition 1:1
                 String output = line.substring(i+1).trim();
 
                 for (OutputPosition position : outputPositions)
                  {    //extend for n:1 cases
-
                      if (position.getPath().equals(output)) {
-                       //  System.out.println("position "+position.getPath()+")=="+output);
                          for(InputElement element:inputElements){
-
                              if (element.getPath().equals(input)) {
-                               //  System.out.println("input "+element.getPath()+")=="+input);
                                  OutputResolver resolver = new OutputResolver();
                                  resolver.elementList.add(element);
                                  resolvers.add(resolver);
@@ -169,7 +116,8 @@ public class DataMapperMediator {
                     }
                  }
             }while(sc.hasNextLine());
-            System.out.println("---Map---");
+
+            System.out.println("---Map : "+map.size());
             for (Map.Entry<OutputPosition,OutputResolver> entry : map.entrySet()) {
                 System.out.println(entry.getKey() +" -->  " + entry.getValue());
             }
@@ -177,10 +125,7 @@ public class DataMapperMediator {
             e.printStackTrace();
         }
     }
-    public  String getRequest(){
-        return null;
 
-    }
     public void evaluateRequest(File request) {
         List<String> values;
         String value;
@@ -191,8 +136,7 @@ public class DataMapperMediator {
                 value = value.concat(item).concat(",");
             }
             entry.getKey().setValue(value);
-        }
-
+        }  System.out.println("---Result----");
         for (OutputPosition output : outputPositions) {
             System.out.println("Element:" + output.getElement() + "  value:" + output.getValue());
         }

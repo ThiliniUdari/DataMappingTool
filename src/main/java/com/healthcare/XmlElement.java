@@ -4,34 +4,20 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.*;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.*;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class XmlElement implements InputElement{
     private String sourceId;
     private String xPath;
     private String element;
     private String type;
-    private String value; //request
 
-    public String getValue() {
-        return value;
-    }
-    public void setValue(String value) {
-        this.value = value;
-    }
+
     public void setType(String type) {
         this.type = type;
     }
@@ -39,8 +25,7 @@ public class XmlElement implements InputElement{
         return type;
     }
 
-
-   public void setxPath(String xPath) {
+   public void setPath(String xPath) {
        this.xPath = xPath;
    }
     public String getElement() { return element; }
@@ -50,70 +35,43 @@ public class XmlElement implements InputElement{
     public String getSourceId() { return sourceId;}
     public void setSourceId(String sourceId) { this.sourceId = sourceId;}
 
-    Map<String,String> result=new HashMap<>();
 
-
-    public Map generatePath(File file)  {
-//   set the xPath variable
-
-        SAXParserFactory spf = SAXParserFactory.newInstance();
-        SAXParser sp = null;
-        XMLReader xr = null;
-
-        try {
-            sp = spf.newSAXParser();
-            xr = sp.getXMLReader();
-            FragmentContentHandler contentHandler=new FragmentContentHandler(xr);
-            xr.setContentHandler(contentHandler);
-            xr.parse(new InputSource(new FileInputStream(file)));
-            result= contentHandler.result ;
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-
-        }
-        //contentHandler.clearResultMap();
-
-        return result;
-
-
-    }
-
-    @Override
     public List evaluatePath(File request) {
+        //Want to read all book names from XML
+        ArrayList<String> values = new ArrayList<String>();
 
-    List<String> values=new ArrayList<>();
-        //Get DOM
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = null;
         try {
-            db = dbf.newDocumentBuilder();
-            Document xmlMsg = db.parse(request);
-            //Get XPath
-            XPathFactory xpf = XPathFactory.newInstance();
-            XPath xpath = xpf.newXPath();
+            //Parse XML file
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new FileInputStream(request));
 
-            String name = (String) xpath.evaluate(this.xPath.concat("/text()"), xmlMsg, XPathConstants.STRING);
-            //Get all matches
-            NodeList nodes = null;
-                nodes = (NodeList) xpath.evaluate(this.xPath.concat("/text()"), xmlMsg, XPathConstants.NODESET);
+            //Get XPath expression
+            XPathFactory xpathfactory = XPathFactory.newInstance();
+            XPath xpath = xpathfactory.newXPath();
+            xpath.setNamespaceContext(new NamespaceResolver(doc));
+            XPathExpression expr = xpath.compile(this.xPath+"/text()");
+
+            //Search XPath expression
+            Object result = expr.evaluate(doc, XPathConstants.NODESET);
+
+            //Iterate over results and fetch values
+            NodeList nodes = (NodeList) result;
             for (int i = 0; i < nodes.getLength(); i++) {
                 values.add(nodes.item(i).getNodeValue());
-                //System.out.println("Value:"+nodes.item(i).getNodeValue());
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }catch (XPathExpressionException e) {
+        } catch (XPathExpressionException e) {
             e.printStackTrace();
         }
-       return values;
+        return values;
     }
 }

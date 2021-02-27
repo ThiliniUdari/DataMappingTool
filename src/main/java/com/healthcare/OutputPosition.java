@@ -2,18 +2,18 @@ package com.healthcare;
 
 public interface OutputPosition{
 
+    void setId(String id);
+     String getType() ;
+     void setType(String type) ;
 
-    public String getType() ;
-    public void setType(String type) ;
+     String getPath() ;
+     void setPath(String path) ;
 
-    public String getPath() ;
-    public void setPath(String path) ;
+     String getValue() ;
+     void setValue(String value) ;
 
-    public String getValue() ;
-    public void setValue(String value) ;
-
-    public String getElement() ;
-    public void setElement(String element) ;
+     String getElement() ;
+     void setElement(String element) ;
 
 
 }
