@@ -4,7 +4,6 @@ import org.xml.sax.*;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +64,7 @@ public class FragmentContentHandler  extends DefaultHandler{
 
         if (value.length() > 0) {
             //System.out.println(xPath + "='" + characters.toString() + "'");//with values
-           // System.out.println(xPath +" Name :"+qName);//no value, xpath with element name
+           // System.out.println(xPath +" Name :"+qName);//xpath with element name
 
             for (Map.Entry<String,String> entry:result.entrySet()){
                 if(entry.getKey() == xPath) {
@@ -81,9 +80,7 @@ public class FragmentContentHandler  extends DefaultHandler{
     public void characters(char[] ch, int start, int length) throws SAXException {
         characters.append(ch, start, length);
     }
-    public void clearResultMap(){
-      //  result.clear();
-    }
+
     public  Map generateXPath (File file) throws ParserConfigurationException, SAXException, IOException {
         SAXParserFactory spf = SAXParserFactory.newInstance();
         SAXParser sp = spf.newSAXParser();
@@ -93,5 +90,4 @@ public class FragmentContentHandler  extends DefaultHandler{
         xr.parse(new InputSource(new FileInputStream(file)));
         return result;
     }
-
 }

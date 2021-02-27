@@ -16,7 +16,7 @@ public class Main {
 
         Scanner scanner=new Scanner(System.in);
         int option;
-        String type;
+        String type,filePath;
         DataMapperMediator mediator =new DataMapperMediator();
 
         while (true) {
@@ -35,43 +35,42 @@ public class Main {
             switch (option) {
                 case 1:
                     //Input file
-//                    XmlElement input= new XmlElement();
-//                    input.generatePath();
-                    System.out.println("Type:");
+                    System.out.print("Type:");
                     type = scanner.next();
 
-                    System.out.println("Input File: ");
+                    System.out.print("Input File: ");
                     String fileName=scanner.next();
-                    String inputFilePath = ROOTPATH.concat(fileName);
+                    filePath = ROOTPATH.concat(fileName);
 
-                    String input = loadFile(inputFilePath);
+                    String input = loadFile(filePath);
                     mediator.loadInput(type, input,fileName);
                     break;
 
                 case 2:
                     //output file
-                    System.out.println("Type:");
+                    System.out.print("Type:");
                     type = scanner.next();
 
-                    System.out.println("Output File: ");
+                    System.out.print("Output File: ");
                     String outputfileName=scanner.next();
 
-                    String outputFilePath = ROOTPATH.concat(outputfileName);
+                    filePath = ROOTPATH.concat(outputfileName);
 
-                    String output = loadFile(outputFilePath);
+                    String output = loadFile(filePath);
                     mediator.loadOutput(type, output,outputfileName);
                     break;
 
                 case 3:
-                    //mapping
-                    mediator.doMapping();
-
+                  //  mapping
+                    System.out.print("Map file:");
+                    filePath = ROOTPATH.concat(scanner.next());
+                    mediator.doMapping(new File(filePath));
                     break;
 
                 case 4:
                     //send request msg
-                    System.out.println("Request: ");
-                    String filePath = ROOTPATH.concat(scanner.next());
+                    System.out.print("Request: ");
+                    filePath = ROOTPATH.concat(scanner.next());
 
                     mediator.evaluateRequest(new File(filePath));
 
