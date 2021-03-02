@@ -1,12 +1,8 @@
 package com.healthcare;
 
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.*;
 
 import static com.healthcare.Main.ROOTPATH;
@@ -28,7 +24,8 @@ public class DataMapperMediator {
 
     public void loadInput(String type, String inputPayload ,String inputFileName) {
         this.inputFileName=inputFileName;
-        String srcId="src001"; //***temp
+        UUID uuid=UUID.randomUUID();
+        String srcId=uuid.toString();
         Source src=new Source(inputPayload);
         src.setType(type);
         src.setId(srcId);
@@ -37,7 +34,8 @@ public class DataMapperMediator {
 
     public void loadOutput(String type,String outputPayload,String outputFileName){
         this.outputFileName =outputFileName;
-        String destId ="dest001";  //temp
+        UUID uuid=UUID.randomUUID();
+        String destId =uuid.toString();
         Destination dest =new Destination(outputPayload);
         dest.setId(destId);
         dest.setType(type);
@@ -61,8 +59,6 @@ public class DataMapperMediator {
     public void createElementList(String id,String type,File file,boolean isSource){
 
        ElementFactory elementFactory =new ElementFactory();
-
-
 
        Map<String,String>pathResults=elementFactory.generatePath(type,file); // for xml files
        Map<String,String>  xpathfromXsd = getAllXpaths(file);// for xsd files
@@ -99,11 +95,11 @@ public class DataMapperMediator {
                 line =sc.nextLine();
                 int i=line.indexOf('=');
 
-                String input =line.substring(0,i).trim();// simple transition 1:1
+                String input =line.substring(0,i).trim();
                 String output = line.substring(i+1).trim();
 
                 for (OutputPosition position : outputPositions)
-                 {    //extend for n:1 cases
+                 {
                      if (position.getPath().equals(output)) {
                          for(InputElement element:inputElements){
                              if (element.getPath().equals(input)) {
@@ -142,3 +138,4 @@ public class DataMapperMediator {
         }
     }
 }
+

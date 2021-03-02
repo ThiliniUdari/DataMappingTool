@@ -35,6 +35,7 @@ public class Main {
             switch (option) {
                 case 1:
                     //Input file
+
                     System.out.print("Type:");
                     type = scanner.next();
 
@@ -73,13 +74,13 @@ public class Main {
                     filePath = ROOTPATH.concat(scanner.next());
 
                     mediator.evaluateRequest(new File(filePath));
-
-
             }
         }
 
     }
+/*
 
+ */
     public static String loadFile(String filePath){
         StringBuilder contentBuilder = new StringBuilder();
         try (Stream<String> stream = Files.lines( Paths.get(filePath), StandardCharsets.UTF_8))
